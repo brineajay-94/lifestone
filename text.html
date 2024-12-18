@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Authentication</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        .form-container {
+            margin: auto;
+            max-width: 400px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js"></script>
+</head>
+<body>
+    <h1>Welcome to My Website</h1>
+    <div id="signup-container" class="form-container">
+        <h2>Sign Up</h2>
+        <input type="email" id="signup-email" placeholder="Email" required>
+        <input type="password" id="signup-password" placeholder="Password" required>
+        <button onclick="signUp()">Sign Up</button>
+    </div>
+
+    <div id="login-container" class="form-container hidden">
+        <h2>Login</h2>
+        <input type="email" id="login-email" placeholder="Email" required>
+        <input type="password" id="login-password" placeholder="Password" required>
+        <button onclick="logIn()">Login</button>
+    </div>
+
+    <div id="welcome-container" class="form-container hidden">
+        <h2>Welcome, <span id="user-email"></span>!</h2>
+        <button onclick="logOut()">Log Out</button>
+    </div>
+
+    <script>
+        // Your Firebase configuration here
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.getAuth(app);
+
+        const signUpContainer = document.getElementById('signup-container');
+        const loginContainer = document.getElementById('login-container');
+        const welcomeContainer = document.getElementById('welcome-container');
+        const userEmail = document.getElementById('user-email');
+
+        // Sign Up function
+        function signUp() {
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+
+            firebase.createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert('Account created successfully!');
+                    showLogin();
+                })
+                .catch((error) => {
+                    alert(error.message);
+                });
+        }
+
+        // Log In function
+        function logIn() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            firebase.signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    userEmail.textContent = userCredential.user.email;
+                    showWelcome();
+                })
+                .catch((error) => {
+                    alert(error.message);
+                });
+        }
+
+        // Log Out function
+        function logOut() {
+            firebase.signOut(auth).then(() => {
+                alert('Logged out successfully!');
+                showLogin();
+            });
+        }
+
+        // Show containers
+        function showSignUp() {
+            signUpContainer.classList.remove('hidden');
+            loginContainer.classList.add('hidden');
+            welcomeContainer.classList.add('hidden');
+        }
+
+        function showLogin() {
+            signUpContainer.classList.add('hidden');
+            loginContainer.classList.remove('hidden');
+            welcomeContainer.classList.add('hidden');
+        }
+
+        function showWelcome() {
+            signUpContainer.classList.add('hidden');
+            loginContainer.classList.add('hidden');
+            welcomeContainer.classList.remove('hidden');
+        }
+
+        // Initial state
+        showSignUp();
+    </script>
+</body>
+</html>
